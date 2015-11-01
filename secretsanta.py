@@ -1,6 +1,7 @@
 import random
 import simplejson as json
-
+import smtplib
+from email.mime.text import MIMEText
 
 class Santadriver(object):
     """HO HO HO! Santa Driver takes the people who are in your config.json and
@@ -87,6 +88,7 @@ class Santadriver(object):
         santas = self.calculate_santa_order()
         subject = "Your Secret Santa Assignment"
 
+        smtp_conn = smtplib.SMTP()
         print self.FROM
         for t in santas:
             assignment = (santas.index(t) + 1) % len(santas)
@@ -101,6 +103,12 @@ class Santadriver(object):
                        "Santa Claus\n"
                       ) % (
                           t, santas[assignment], self.people[santas[assignment]])
+            msg = MIMEText(message)
+            msg['Subject'] = subject
+            msg['From'] = self.FROM
+            msg['To'] = self.people[t]
+            smtp_conn.sendmail(email_from, email_to, msg.as_string())
+        smtp_conn.quit()
 
 
 if __name__ == '__main__':
