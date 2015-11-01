@@ -1,4 +1,3 @@
-from boto import ses
 import random
 import simplejson as json
 
@@ -12,8 +11,6 @@ class Santadriver(object):
         """Santadriver(config, debug=None) -> initializes Santa selection via info in config.json"""
         self.debug = False if debug is None or type(debug) != type(True) else debug
         self.HIDDENSEED = 0 if 'randomseed' not in config else config['randomseed']
-        self.AWS_ACCESS_KEY_ID = config['aws_key_id']
-        self.AWS_SECRET_ACCESS_KEY = config['aws_secret']
         self.FROM = config['from_email']
         #a dict containing name/email pairs
         self.people = config['people']
@@ -89,8 +86,6 @@ class Santadriver(object):
         """email_santas(santas = None) --> email secret santas where each santa is a santa to the next person in the list santas"""
         santas = self.calculate_santa_order()
         subject = "Your Secret Santa Assignment"
-        sesconn = ses.connection.SESConnection(aws_access_key_id=self.AWS_ACCESS_KEY_ID,
-                                               aws_secret_access_key=self.AWS_SECRET_ACCESS_KEY)
 
         print self.FROM
         for t in santas:
@@ -106,7 +101,6 @@ class Santadriver(object):
                        "Santa Claus\n"
                       ) % (
                           t, santas[assignment], self.people[santas[assignment]])
-            sesconn.send_email(self.FROM, subject, message, self.people[t])
 
 
 if __name__ == '__main__':
